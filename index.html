@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Invoice Generator - Biology Expert by Dr. Tareq</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @media print {
+        #invoice-form,
+        #actions {
+          display: none;
+        }
+        #invoice {
+          page-break-after: always;
+        }
+      }
+      .invoice-box {
+        width: 100%;
+        min-height: 14.8cm; /* half of A4 height */
+        border: 2px solid #333;
+        padding: 20px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 p-6">
+    <!-- Input Form -->
+    <div
+      id="invoice-form"
+      class="max-w-2xl mx-auto bg-white p-6 rounded-xl shadow-md mb-6"
+    >
+      <img src="/logo.png" alt="" class="w-1/4 mx-auto" />
+      <h2
+        class="text-xl font-bold mb-4 text-center mt-4 bg-gray-100 p-2 border rounded"
+      >
+        Invoice Generator
+      </h2>
+
+      <label class="block mb-2">Date</label>
+      <input type="date" id="date" class="w-full border p-2 rounded mb-4" />
+
+      <label class="block mb-2">Name</label>
+      <select id="name" class="w-full border p-2 rounded mb-4">
+        <option value="">Select Student</option>
+      </select>
+
+      <label class="block mb-2">Contact No</label>
+      <input
+        type="text"
+        id="contact"
+        class="w-full border p-2 rounded mb-4"
+        readonly
+      />
+
+      <label class="block mb-2">Address</label>
+      <textarea
+        id="address"
+        class="w-full border p-2 rounded mb-4"
+        rows="2"
+        readonly
+      ></textarea>
+
+      <label class="block mb-2">Payment of</label>
+      <div class="flex gap-2 mb-4">
+        <select id="month" class="border p-2 rounded flex-1">
+          <option>January</option>
+          <option>February</option>
+          <option>March</option>
+          <option>April</option>
+          <option>May</option>
+          <option>June</option>
+          <option>July</option>
+          <option>August</option>
+          <option>September</option>
+          <option>October</option>
+          <option>November</option>
+          <option>December</option>
+        </select>
+        <input
+          type="number"
+          id="year"
+          class="border p-2 rounded w-28"
+          value="2025"
+        />
+      </div>
+
+      <label class="block mb-2">Amount (number)</label>
+      <input type="number" id="amount" class="w-full border p-2 rounded mb-2" />
+      <p class="text-sm text-gray-600">
+        Amount in words: <span id="amount-words" class="font-semibold"></span>
+      </p>
+
+      <button
+        onclick="generateInvoice()"
+        class="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+      >
+        Generate Invoice
+      </button>
+    </div>
+
+    <!-- Invoice Preview -->
+    <div
+      id="invoice"
+      class="max-w-3xl mx-auto bg-white invoice-box hidden"
+    ></div>
+
+    <!-- Actions -->
+    <div id="actions" class="text-center mt-4 hidden">
+      <button
+        onclick="window.print()"
+        class="bg-green-600 text-white px-4 py-2 rounded mr-2"
+      >
+        🖨️ Print
+      </button>
+      <button
+        onclick="downloadPDF()"
+        class="bg-purple-600 text-white px-4 py-2 rounded"
+      >
+        📥 Download PDF
+      </button>
+    </div>
+
+    <!-- JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <script>
+      const months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+
+      // Student Data
+      const students = [
+        {
+          name: "Mariam Akter Mim",
+          address: "KA-53/3, Kalachadpur, Gulshan- Dhaka 1212",
+          contact: "1721542055",
+        },
+        {
+          name: "Sumaiya Binta Ayub (Afroza Onu)",
+          address: "14/10, Kalachadpur, Gulshan, Dhaka-1212",
+          contact: "88",
+        },
+        {
+          name: "ইমতিয়াজ আহমেদ আপন",
+          address: "৩৯/১, নদ্দা স্প্রপকার বাড়ি",
+          contact: "1830921568",
+        },
+        {
+          name: "Soubik Ghosh",
+          address: "ka 14/2 South Kuril",
+          contact: "1719350647",
+        },
+      ];
+
+      // Populate dropdown
+      const nameSelect = document.getElementById("name");
+      students.forEach((s) => {
+        const opt = document.createElement("option");
+        opt.value = s.name;
+        opt.textContent = s.name;
+        nameSelect.appendChild(opt);
+      });
+
+      // Auto fill details
+      nameSelect.addEventListener("change", function () {
+        const student = students.find((s) => s.name === this.value);
+        if (student) {
+          document.getElementById("contact").value = student.contact;
+          document.getElementById("address").value = student.address;
+        } else {
+          document.getElementById("contact").value = "";
+          document.getElementById("address").value = "";
+        }
+      });
+
+      // Convert number to words
+      function numberToWords(num) {
+        if (!num) return "";
+        const a = [
+          "",
+          "One",
+          "Two",
+          "Three",
+          "Four",
+          "Five",
+          "Six",
+          "Seven",
+          "Eight",
+          "Nine",
+          "Ten",
+          "Eleven",
+          "Twelve",
+          "Thirteen",
+          "Fourteen",
+          "Fifteen",
+          "Sixteen",
+          "Seventeen",
+          "Eighteen",
+          "Nineteen",
+        ];
+        const b = [
+          "",
+          "",
+          "Twenty",
+          "Thirty",
+          "Forty",
+          "Fifty",
+          "Sixty",
+          "Seventy",
+          "Eighty",
+          "Ninety",
+        ];
+        function inWords(n) {
+          if (n < 20) return a[n];
+          if (n < 100)
+            return b[Math.floor(n / 10)] + (n % 10 ? " " + a[n % 10] : "");
+          if (n < 1000)
+            return (
+              a[Math.floor(n / 100)] +
+              " Hundred " +
+              (n % 100 ? inWords(n % 100) : "")
+            );
+          if (n < 100000)
+            return (
+              inWords(Math.floor(n / 1000)) +
+              " Thousand " +
+              (n % 1000 ? inWords(n % 1000) : "")
+            );
+          return n;
+        }
+        return inWords(num).trim() + " Taka Only";
+      }
+
+      document.getElementById("amount").addEventListener("input", function () {
+        document.getElementById("amount-words").textContent = numberToWords(
+          parseInt(this.value)
+        );
+      });
+
+      function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
+      }
+
+      function generateInvoice() {
+        const date = formatDate(document.getElementById("date").value);
+        const name = document.getElementById("name").value;
+        const contact = document.getElementById("contact").value;
+        const address = document.getElementById("address").value;
+        const month = document.getElementById("month").value;
+        const year = document.getElementById("year").value;
+        const amount = document.getElementById("amount").value;
+        const amountWords = numberToWords(parseInt(amount));
+
+        const invoiceHTML = `
+        <div class="text-center  mb-4 bg-[#F6F5F3]">
+            <img src="/logo.png" alt="" class="w-1/4 mx-auto pb-4" />
+          
+          
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4 ">
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Payment of:</strong> ${month} ${year}</p>
+          <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Contact:</strong> ${contact}</p>
+          <p class="col-span-2"><strong>Address:</strong> ${address}</p>
+        </div>
+        <table class="w-full border-collapse border mb-4 ">
+          <tr class="bg-gray-100">
+            <th class="border p-2">Description</th>
+            <th class="border p-2">Amount</th>
+          </tr>
+          <tr>
+            <td class="border p-2">Tuition Fee</td>
+            <td class="border p-2 text-right">${amount} Tk</td>
+          </tr>
+        </table>
+        <p><strong>In Words:</strong> ${amountWords}</p>
+        <div class="flex justify-between mt-12">
+          <p>----------------------<br>Signature</p>
+          <p>----------------------<br>Received By</p>
+        </div>
+      `;
+        document.getElementById("invoice").innerHTML = invoiceHTML;
+        document.getElementById("invoice").classList.remove("hidden");
+        document.getElementById("actions").classList.remove("hidden");
+      }
+
+      function downloadPDF() {
+        const element = document.getElementById("invoice");
+        html2pdf().from(element).save("invoice.pdf");
+      }
+    </script>
+  </body>
+</html>
