@@ -17,13 +17,13 @@
       .invoice-box {
         width: 100%;
         min-height: 14.8cm; /* half of A4 height */
-        border: 2px solid #333;
-        padding: 20px;
+        border: 1px solid #333;
+        padding: 10px;
         font-size: 14px;
       }
     </style>
   </head>
-  <body class="bg-gray-100 p-6">
+  <body class="p-6">
     <!-- Input Form -->
     <div
       id="invoice-form"
@@ -143,22 +143,22 @@
         {
           name: "Mariam Akter Mim",
           address: "KA-53/3, Kalachadpur, Gulshan- Dhaka 1212",
-          contact: "1721542055",
+          contact: "01721542055",
         },
         {
           name: "Sumaiya Binta Ayub (Afroza Onu)",
           address: "14/10, Kalachadpur, Gulshan, Dhaka-1212",
-          contact: "88",
+          contact: "01819477168",
         },
         {
           name: "ইমতিয়াজ আহমেদ আপন",
-          address: "৩৯/১, নদ্দা স্প্রপকার বাড়ি",
-          contact: "1830921568",
+          address: "৩৯/১, নদ্দা সরকার বাড়ি",
+          contact: "01830921568",
         },
         {
           name: "Soubik Ghosh",
           address: "ka 14/2 South Kuril",
-          contact: "1719350647",
+          contact: "01719350647",
         },
       ];
 
@@ -271,7 +271,7 @@
           
           
         </div>
-        <div class="grid grid-cols-2 gap-4 mb-4 ">
+        <div class="grid grid-cols-2 gap-4 mb-1 ">
           <p><strong>Date:</strong> ${date}</p>
           <p><strong>Payment of:</strong> ${month} ${year}</p>
           <p><strong>Name:</strong> ${name}</p>
@@ -284,12 +284,12 @@
             <th class="border p-2">Amount</th>
           </tr>
           <tr>
-            <td class="border p-2">Tuition Fee</td>
+            <td class="border p-2">Tuition Fee of ${month} ${year} </td>
             <td class="border p-2 text-right">${amount} Tk</td>
           </tr>
         </table>
         <p><strong>In Words:</strong> ${amountWords}</p>
-        <div class="flex justify-between mt-12">
+        <div class="flex justify-between mt-8">
           <p>----------------------<br>Signature</p>
           <p>----------------------<br>Received By</p>
         </div>
